@@ -17,7 +17,10 @@ const __dirname = dirname(__filename);
 
 // Detect OS for yt-dlp path
 const isWindows = os.platform() === "win32";
-const ytDlpPath = isWindows ? join(__dirname, "yt-dlp.exe") : "yt-dlp";
+// On Render (Linux), we expect yt-dlp to be in the server directory (downloaded via postinstall) or in PATH
+const ytDlpPath = isWindows 
+  ? join(__dirname, "yt-dlp.exe") 
+  : (fs.existsSync(join(__dirname, "yt-dlp")) ? join(__dirname, "yt-dlp") : "yt-dlp");
 
 ffmpeg.setFfmpegPath(ffmpegPath);
 
@@ -229,6 +232,6 @@ app.get("/api/download", async (req, res) => {
   });
 });
 
-app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
+app.listen(PORT, "0.0.0.0", () => {
+  console.log(`Server running on http://0.0.0.0:${PORT}`);
 });
