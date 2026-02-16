@@ -33,12 +33,10 @@ const GLOBAL_YT_ARGS = [
   "--no-warnings",
   "--no-playlist",
   "--no-check-certificate",
+  "--force-ipv4",
   "--no-check-formats",
   "--no-mtime",
-  "--js-runtime",
-  process.execPath,
-  "--extractor-args",
-  "youtube:player_client=hls,android",
+  "--extractor-args", "youtube:player_client=web,mweb,tv,ios",
 ];
 
 app.use(
