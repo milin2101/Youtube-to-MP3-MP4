@@ -17,10 +17,13 @@ const __dirname = dirname(__filename);
 
 // Detect OS for yt-dlp path
 const isWindows = os.platform() === "win32";
-// On Render (Linux), we expect yt-dlp to be in the server directory (downloaded via postinstall) or in PATH
-const ytDlpPath = isWindows
-  ? join(__dirname, "yt-dlp.exe")
-  : (fs.existsSync(join(__dirname, "yt-dlp")) ? join(__dirname, "yt-dlp") : "yt-dlp");
+// Try system-wide yt-dlp first, then fallback to local binaries/names
+let ytDlpPath = "yt-dlp";
+if (isWindows) {
+  ytDlpPath = join(__dirname, "yt-dlp.exe");
+} else if (fs.existsSync(join(__dirname, "yt-dlp"))) {
+  ytDlpPath = join(__dirname, "yt-dlp");
+}
 
 ffmpeg.setFfmpegPath(ffmpegPath);
 
@@ -28,19 +31,14 @@ const app = express();
 const PORT = process.env.PORT || 4000;
 const API_URL = process.env.API_URL || `http://localhost:${PORT}`;
 
-// Performance flags and JS runtime for maximum speed
+// Performance flags for maximum speed
 const GLOBAL_YT_ARGS = [
   "--no-warnings",
   "--no-playlist",
   "--no-check-certificate",
   "--force-ipv4",
-  "--no-check-formats",
   "--no-mtime",
-  "--user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36",
-  "--referer", "https://www.youtube.com/",
-  "--extractor-args", "youtube:player_client=web,mweb,tv,ios,android",
-  "--add-header", "Accept:text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
-  "--add-header", "Accept-Language:en-US,en;q=0.9",
+  // We remove forced user-agent and extractor-args to let yt-dlp handle modern challenges natively
 ];
 
 const getCookiesArg = () => {
