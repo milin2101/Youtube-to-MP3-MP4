@@ -240,15 +240,15 @@ app.get("/api/download", async (req, res) => {
   });
 });
 
-// Catch-all: serve React app for any non-API route (Express v5 syntax)
-const indexHtml = join(distPath, 'index.html');
-if (fs.existsSync(indexHtml)) {
-  app.get('/:path*', (req, res) => {
-    if (!req.path.startsWith('/api')) {
-      res.sendFile(indexHtml);
-    }
-  });
-}
+// Catch-all: serve React app for any non-API route (Express v5 compatible)
+app.use((req, res, next) => {
+  const indexHtml = join(distPath, 'index.html');
+  if (!req.path.startsWith('/api') && fs.existsSync(indexHtml)) {
+    res.sendFile(indexHtml);
+  } else {
+    next();
+  }
+});
 
 app.listen(PORT, "0.0.0.0", () => {
   console.log(`Server running on http://0.0.0.0:${PORT}`);
