@@ -52,6 +52,9 @@ app.use(
 );
 app.use(express.json());
 
+// Serve the built React frontend
+app.use(express.static(join(__dirname, '..', 'dist')));
+
 // Endpoint to get video details
 app.get("/api/info", async (req, res) => {
   console.log("Received info request for:", req.query.url);
@@ -232,6 +235,13 @@ app.get("/api/download", async (req, res) => {
       }
     }
   });
+});
+
+// Catch-all: serve React app for any non-API route
+app.get('*', (req, res) => {
+  if (!req.path.startsWith('/api')) {
+    res.sendFile(join(__dirname, '..', 'dist', 'index.html'));
+  }
 });
 
 app.listen(PORT, "0.0.0.0", () => {
