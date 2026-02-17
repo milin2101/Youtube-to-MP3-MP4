@@ -52,8 +52,11 @@ app.use(
 );
 app.use(express.json());
 
-// Serve the built React frontend
-app.use(express.static(join(__dirname, '..', 'dist')));
+// Serve the built React frontend (only if dist exists, i.e. production)
+const distPath = join(__dirname, '..', 'dist');
+if (fs.existsSync(distPath)) {
+  app.use(express.static(distPath));
+}
 
 // Endpoint to get video details
 app.get("/api/info", async (req, res) => {
@@ -237,12 +240,15 @@ app.get("/api/download", async (req, res) => {
   });
 });
 
-// Catch-all: serve React app for any non-API route (Express v5 syntax)
-app.get('{*path}', (req, res) => {
-  if (!req.path.startsWith('/api')) {
-    res.sendFile(join(__dirname, '..', 'dist', 'index.html'));
-  }
-});
+// Catch-all: serve React app for any non-API route (only in production)
+const indexHtml = join(distPath, 'index.html');
+if (fs.existsSync(indexHtml)) {
+  app.get('{*path}', (req, res) => {
+    if (!req.path.startsWith('/api')) {
+      res.sendFile(indexHtml);
+    }
+  });
+}
 
 app.listen(PORT, "0.0.0.0", () => {
   console.log(`Server running on http://0.0.0.0:${PORT}`);
