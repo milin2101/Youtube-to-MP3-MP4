@@ -18,8 +18,8 @@ const __dirname = dirname(__filename);
 // Detect OS for yt-dlp path
 const isWindows = os.platform() === "win32";
 // On Render (Linux), we expect yt-dlp to be in the server directory (downloaded via postinstall) or in PATH
-const ytDlpPath = isWindows 
-  ? join(__dirname, "yt-dlp.exe") 
+const ytDlpPath = isWindows
+  ? join(__dirname, "yt-dlp.exe")
   : (fs.existsSync(join(__dirname, "yt-dlp")) ? join(__dirname, "yt-dlp") : "yt-dlp");
 
 ffmpeg.setFfmpegPath(ffmpegPath);
@@ -237,8 +237,8 @@ app.get("/api/download", async (req, res) => {
   });
 });
 
-// Catch-all: serve React app for any non-API route
-app.get('*', (req, res) => {
+// Catch-all: serve React app for any non-API route (Express v5 syntax)
+app.get('{*path}', (req, res) => {
   if (!req.path.startsWith('/api')) {
     res.sendFile(join(__dirname, '..', 'dist', 'index.html'));
   }
