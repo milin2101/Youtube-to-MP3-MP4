@@ -43,6 +43,14 @@ const GLOBAL_YT_ARGS = [
   "--add-header", "Accept-Language:en-US,en;q=0.9",
 ];
 
+const getCookiesArg = () => {
+  const cookiesPath = join(__dirname, "cookies.txt");
+  if (fs.existsSync(cookiesPath)) {
+    return ["--cookies", cookiesPath];
+  }
+  return [];
+};
+
 app.use(
   cors({
     origin: process.env.CORS_ORIGIN || "*",
@@ -71,7 +79,8 @@ app.get("/api/info", async (req, res) => {
     }
 
     console.log("Spawning yt-dlp for info...");
-    const ytDlpProcess = spawn(ytDlpPath, [...GLOBAL_YT_ARGS, "-j", videoURL]);
+    const args = [...getCookiesArg(), ...GLOBAL_YT_ARGS, "-j", videoURL];
+    const ytDlpProcess = spawn(ytDlpPath, args);
 
     let outputData = "";
     let errorData = "";
@@ -130,14 +139,16 @@ app.get("/api/trending", async (req, res) => {
   console.log("Fetching trending videos...");
   try {
     const query = "ytsearch4:trending music";
-    const ytDlpProcess = spawn(ytDlpPath, [
+    const args = [
+      ...getCookiesArg(),
       ...GLOBAL_YT_ARGS,
       "--dump-json",
       "--flat-playlist",
       "--playlist-end",
       "4",
       query,
-    ]);
+    ];
+    const ytDlpProcess = spawn(ytDlpPath, args);
 
     let outputData = "";
 
@@ -219,7 +230,8 @@ app.get("/api/download", async (req, res) => {
     );
   }
 
-  const ytDlpProcess = spawn(ytDlpPath, ytArgs);
+  const args = [...getCookiesArg(), ...ytArgs];
+  const ytDlpProcess = spawn(ytDlpPath, args);
 
   // Pipe directly to response
   ytDlpProcess.stdout.pipe(res);
