@@ -243,7 +243,7 @@ app.get("/api/download", async (req, res) => {
 // Catch-all: serve React app for any non-API route (Express v5 syntax)
 const indexHtml = join(distPath, 'index.html');
 if (fs.existsSync(indexHtml)) {
-  app.get('/(.*)', (req, res) => {
+  app.get('/:path*', (req, res) => {
     if (!req.path.startsWith('/api')) {
       res.sendFile(indexHtml);
     }
