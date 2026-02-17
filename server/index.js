@@ -42,9 +42,13 @@ const GLOBAL_YT_ARGS = [
 ];
 
 const getCookiesArg = () => {
-  const cookiesPath = join(__dirname, "cookies.txt");
-  if (fs.existsSync(cookiesPath)) {
-    return ["--cookies", cookiesPath];
+  const serverCookies = join(__dirname, "cookies.txt");
+  const rootCookies = join(__dirname, "..", "cookies.txt");
+
+  if (fs.existsSync(serverCookies)) {
+    return ["--cookies", serverCookies];
+  } else if (fs.existsSync(rootCookies)) {
+    return ["--cookies", rootCookies];
   }
   return [];
 };
