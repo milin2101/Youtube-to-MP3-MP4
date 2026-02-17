@@ -1,7 +1,7 @@
 import express from "express";
 import cors from "cors";
 import { fileURLToPath } from "url";
-import { dirname, join } from "path";
+import { dirname, join, delimiter } from "path";
 import { spawn } from "child_process";
 import ffmpeg from "fluent-ffmpeg";
 import ffmpegPath from "ffmpeg-static";
@@ -87,7 +87,7 @@ app.get("/api/info", async (req, res) => {
     const spawnOptions = {
       env: {
         ...process.env,
-        PATH: process.env.PATH + ":/usr/local/bin:/usr/bin:/bin"
+        PATH: `${process.env.PATH}${delimiter}/usr/local/bin${delimiter}/usr/bin${delimiter}/bin`
       }
     };
 
@@ -160,7 +160,7 @@ app.get("/api/trending", async (req, res) => {
     const spawnOptions = {
       env: {
         ...process.env,
-        PATH: process.env.PATH + ":/usr/local/bin:/usr/bin:/bin"
+        PATH: `${process.env.PATH}${delimiter}/usr/local/bin${delimiter}/usr/bin${delimiter}/bin`
       }
     };
 
@@ -251,7 +251,7 @@ app.get("/api/download", async (req, res) => {
   const spawnOptions = {
     env: {
       ...process.env,
-      PATH: process.env.PATH + ":/usr/local/bin:/usr/bin:/bin"
+      PATH: `${process.env.PATH}${delimiter}/usr/local/bin${delimiter}/usr/bin${delimiter}/bin`
     }
   };
 
