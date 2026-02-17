@@ -78,7 +78,16 @@ app.get("/api/info", async (req, res) => {
 
     console.log("Spawning yt-dlp for info...");
     const args = [...getCookiesArg(), ...GLOBAL_YT_ARGS, "-j", videoURL];
-    const ytDlpProcess = spawn(ytDlpPath, args);
+
+    // Explicitly pass the PATH to ensure yt-dlp finds JS runtimes (Node, Bun, etc.)
+    const spawnOptions = {
+      env: {
+        ...process.env,
+        PATH: process.env.PATH + ":/usr/local/bin:/usr/bin:/bin"
+      }
+    };
+
+    const ytDlpProcess = spawn(ytDlpPath, args, spawnOptions);
 
     let outputData = "";
     let errorData = "";
@@ -136,17 +145,22 @@ app.get("/api/info", async (req, res) => {
 app.get("/api/trending", async (req, res) => {
   console.log("Fetching trending videos...");
   try {
-    const query = "ytsearch4:trending music";
     const args = [
       ...getCookiesArg(),
       ...GLOBAL_YT_ARGS,
       "--dump-json",
       "--flat-playlist",
-      "--playlist-end",
-      "4",
-      query,
+      "ytsearch20:trending videos music",
     ];
-    const ytDlpProcess = spawn(ytDlpPath, args);
+
+    const spawnOptions = {
+      env: {
+        ...process.env,
+        PATH: process.env.PATH + ":/usr/local/bin:/usr/bin:/bin"
+      }
+    };
+
+    const ytDlpProcess = spawn(ytDlpPath, args, spawnOptions);
 
     let outputData = "";
 
@@ -229,7 +243,15 @@ app.get("/api/download", async (req, res) => {
   }
 
   const args = [...getCookiesArg(), ...ytArgs];
-  const ytDlpProcess = spawn(ytDlpPath, args);
+
+  const spawnOptions = {
+    env: {
+      ...process.env,
+      PATH: process.env.PATH + ":/usr/local/bin:/usr/bin:/bin"
+    }
+  };
+
+  const ytDlpProcess = spawn(ytDlpPath, args, spawnOptions);
 
   // Pipe directly to response
   ytDlpProcess.stdout.pipe(res);
