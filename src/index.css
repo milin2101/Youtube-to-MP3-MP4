@@ -30,44 +30,11 @@
 
 @layer utilities {
   .animate-fade-in {
-    animation: fadeIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    animation: fadeIn 0.4s ease-out forwards;
   }
 
   .animate-fade-in-up {
-    animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-  }
-
-  .glass {
-    background: rgba(15, 23, 42, 0.6);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.8);
-  }
-
-  .glass-card {
-    background: rgba(30, 41, 59, 0.4);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    border: 1px solid rgba(255, 255, 255, 0.05);
-    transition: all 0.3s ease;
-  }
-
-  .glass-card:hover {
-    border-color: rgba(139, 92, 246, 0.3);
-    background: rgba(30, 41, 59, 0.6);
-  }
-
-  .animate-blob {
-    animation: blob 10s infinite;
-  }
-
-  .animation-delay-2000 {
-    animation-delay: 2s;
-  }
-
-  .animation-delay-4000 {
-    animation-delay: 4s;
+    animation: fadeInUp 0.4s ease-out forwards;
   }
 }
 
@@ -87,12 +54,7 @@
   }
 }
 
-@keyframes blob {
-  0% { transform: translate(0px, 0px) scale(1); }
-  33% { transform: translate(40px, -60px) scale(1.2); }
-  66% { transform: translate(-30px, 30px) scale(0.8); }
-  100% { transform: translate(0px, 0px) scale(1); }
-}
+
 
 body {
   background-color: #020617;

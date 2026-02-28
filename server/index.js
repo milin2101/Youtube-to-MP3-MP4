@@ -145,63 +145,7 @@ app.get("/api/info", async (req, res) => {
   }
 });
 
-// Endpoint to get trending videos
-app.get("/api/trending", async (req, res) => {
-  console.log("Fetching trending videos...");
-  try {
-    const args = [
-      ...getCookiesArg(),
-      ...GLOBAL_YT_ARGS,
-      "--dump-json",
-      "--flat-playlist",
-      "ytsearch20:trending videos music",
-    ];
 
-    const spawnOptions = {
-      env: {
-        ...process.env,
-        PATH: `${process.env.PATH}${delimiter}/usr/local/bin${delimiter}/usr/bin${delimiter}/bin`
-      }
-    };
-
-    const ytDlpProcess = spawn(ytDlpPath, args, spawnOptions);
-
-    let outputData = "";
-
-    ytDlpProcess.stdout.on("data", (chunk) => {
-      outputData += chunk;
-    });
-
-    ytDlpProcess.on("close", (code) => {
-      if (code !== 0) {
-        return res
-          .status(500)
-          .json({ error: "Failed to fetch trending videos" });
-      }
-
-      try {
-        const lines = outputData.trim().split("\n");
-        const trendingVideos = lines.map((line) => {
-          const info = JSON.parse(line);
-          return {
-            title: info.title,
-            url: `https://www.youtube.com/watch?v=${info.id}`,
-            thumbnail: `https://i.ytimg.com/vi/${info.id}/hqdefault.jpg`,
-            duration: new Date(info.duration * 1000)
-              .toISOString()
-              .substr(14, 5),
-          };
-        });
-
-        res.json(trendingVideos);
-      } catch (parseError) {
-        res.status(500).json({ error: "Failed to parse trending videos" });
-      }
-    });
-  } catch (error) {
-    res.status(500).json({ error: "Internal server error" });
-  }
-});
 
 // Endpoint to download video/audio (Turbo STREAMING)
 app.get("/api/download", async (req, res) => {
