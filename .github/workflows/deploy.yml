@@ -18,5 +18,5 @@ jobs:
             cd /var/www/Youtube-to-MP3-MP4
             git pull origin main
             npm install
-            VITE_API_URL=http://srv1250088.hstgr.cloud npm run build
+            VITE_API_URL=https://srv1250088.hstgr.cloud npm run build
             pm2 restart ydownload
