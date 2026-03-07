@@ -8,6 +8,8 @@ const Downloader = () => {
   const [videoData, setVideoData] = useState(null);
   const [error, setError] = useState("");
   const [downloadingFormat, setDownloadingFormat] = useState(null); // 'mp3' or 'mp4'
+  const [selectedVideoFormat, setSelectedVideoFormat] = useState("");
+  const [selectedAudioFormat, setSelectedAudioFormat] = useState("");
 
   const handleFetch = async (urlOverride) => {
     const fetchUrl = typeof urlOverride === "string" ? urlOverride : url;
@@ -23,6 +25,12 @@ const Downloader = () => {
         `${apiUrl}/api/info?url=${encodeURIComponent(fetchUrl)}`
       );
       setVideoData(response.data);
+      if (response.data.videoFormats?.length > 0) {
+        setSelectedVideoFormat(response.data.videoFormats[0].format_id);
+      }
+      if (response.data.audioFormats?.length > 0) {
+        setSelectedAudioFormat(response.data.audioFormats[0].format_id);
+      }
     } catch (err) {
       console.error(err);
       setError(
@@ -36,9 +44,12 @@ const Downloader = () => {
   };
 
 
-  const handleDownload = async (downloadUrl, format, title) => {
+  const handleDownload = async (formatId, type, title) => {
     try {
-      setDownloadingFormat(format);
+      setDownloadingFormat(type);
+      const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:4000";
+      const downloadUrl = `${apiUrl}/api/download?url=${encodeURIComponent(url)}&format=${encodeURIComponent(formatId)}&title=${encodeURIComponent(title)}&isAudio=${type === 'mp3'}`;
+
       const response = await axios({
         url: downloadUrl,
         method: 'GET',
@@ -124,45 +135,75 @@ const Downloader = () => {
                 </h3>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
-                  <button
-                    onClick={() => handleDownload(videoData.link_mp3, 'mp3', videoData.title)}
-                    disabled={!!downloadingFormat}
-                    className="group relative overflow-hidden rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 p-4 transition-all flex items-center justify-between disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className="p-2 bg-indigo-500/20 rounded-lg group-hover:bg-indigo-500/30 transition-colors">
-                        {downloadingFormat === 'mp3' ? (
-                          <Loader2 size={20} className="text-indigo-400 animate-spin" />
-                        ) : (
-                          <Music size={20} className="text-indigo-400" />
-                        )}
+                  {/* Audio Column */}
+                  <div className="flex flex-col gap-2">
+                    {videoData.audioFormats && videoData.audioFormats.length > 0 && (
+                      <select
+                        className="bg-slate-800 text-white border border-slate-700 rounded-xl p-3 outline-none focus:border-indigo-500 font-medium"
+                        value={selectedAudioFormat}
+                        onChange={(e) => setSelectedAudioFormat(e.target.value)}
+                        disabled={!!downloadingFormat}
+                      >
+                        {videoData.audioFormats.map(f => (
+                          <option key={f.format_id} value={f.format_id}>{f.label}</option>
+                        ))}
+                      </select>
+                    )}
+                    <button
+                      onClick={() => handleDownload(selectedAudioFormat || 'mp3', 'mp3', videoData.title)}
+                      disabled={!!downloadingFormat}
+                      className="group relative overflow-hidden rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 p-4 transition-all flex items-center justify-between disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="p-2 bg-indigo-500/20 rounded-lg group-hover:bg-indigo-500/30 transition-colors">
+                          {downloadingFormat === 'mp3' ? (
+                            <Loader2 size={20} className="text-indigo-400 animate-spin" />
+                          ) : (
+                            <Music size={20} className="text-indigo-400" />
+                          )}
+                        </div>
+                        <span className="font-bold text-slate-200">
+                          {downloadingFormat === 'mp3' ? 'Processing...' : 'Download Audio'}
+                        </span>
                       </div>
-                      <span className="font-bold text-slate-200">
-                        {downloadingFormat === 'mp3' ? 'Processing...' : 'Audio MP3'}
-                      </span>
-                    </div>
-                    {downloadingFormat !== 'mp3' && <Download size={18} className="text-slate-500 group-hover:text-white transition-colors" />}
-                  </button>
+                      {downloadingFormat !== 'mp3' && <Download size={18} className="text-slate-500 group-hover:text-white transition-colors" />}
+                    </button>
+                  </div>
 
-                  <button
-                    onClick={() => handleDownload(videoData.link_mp4, 'mp4', videoData.title)}
-                    disabled={!!downloadingFormat}
-                    className="group relative overflow-hidden rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 p-4 transition-all flex items-center justify-between disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className="p-2 bg-pink-500/20 rounded-lg group-hover:bg-pink-500/30 transition-colors">
-                        {downloadingFormat === 'mp4' ? (
-                          <Loader2 size={20} className="text-pink-400 animate-spin" />
-                        ) : (
-                          <Video size={20} className="text-pink-400" />
-                        )}
+                  {/* Video Column */}
+                  <div className="flex flex-col gap-2">
+                    {videoData.videoFormats && videoData.videoFormats.length > 0 && (
+                      <select
+                        className="bg-slate-800 text-white border border-slate-700 rounded-xl p-3 outline-none focus:border-pink-500 font-medium"
+                        value={selectedVideoFormat}
+                        onChange={(e) => setSelectedVideoFormat(e.target.value)}
+                        disabled={!!downloadingFormat}
+                      >
+                        {videoData.videoFormats.map(f => (
+                          <option key={f.format_id} value={f.format_id}>{f.label}</option>
+                        ))}
+                      </select>
+                    )}
+                    <button
+                      onClick={() => handleDownload(selectedVideoFormat || 'mp4', 'mp4', videoData.title)}
+                      disabled={!!downloadingFormat}
+                      className="group relative overflow-hidden rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 p-4 transition-all flex items-center justify-between disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="p-2 bg-pink-500/20 rounded-lg group-hover:bg-pink-500/30 transition-colors">
+                          {downloadingFormat === 'mp4' ? (
+                            <Loader2 size={20} className="text-pink-400 animate-spin" />
+                          ) : (
+                            <Video size={20} className="text-pink-400" />
+                          )}
+                        </div>
+                        <span className="font-bold text-slate-200">
+                          {downloadingFormat === 'mp4' ? 'Processing...' : 'Download Video'}
+                        </span>
                       </div>
-                      <span className="font-bold text-slate-200">
-                        {downloadingFormat === 'mp4' ? 'Processing...' : 'Video MP4'}
-                      </span>
-                    </div>
-                    {downloadingFormat !== 'mp4' && <Download size={18} className="text-slate-500 group-hover:text-white transition-colors" />}
-                  </button>
+                      {downloadingFormat !== 'mp4' && <Download size={18} className="text-slate-500 group-hover:text-white transition-colors" />}
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
