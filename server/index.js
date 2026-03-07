@@ -38,7 +38,7 @@ const GLOBAL_YT_ARGS = [
   "--no-check-certificate",
   "--force-ipv4",
   "--no-mtime",
-  // We remove forced user-agent and extractor-args to let yt-dlp handle modern challenges natively
+  "--remote-components", "ejs:github", // Crucial for downloading the latest JS challenge solvers (Deno script)
 ];
 
 const getCookiesArg = () => {
