@@ -17,10 +17,12 @@ const __dirname = dirname(__filename);
 
 // Detect OS for yt-dlp path
 const isWindows = os.platform() === "win32";
-// Try system-wide yt-dlp first, then fallback to local binaries/names
+// Try to use the pip-installed yt-dlp first, then fallback to local binaries/names
 let ytDlpPath = "yt-dlp";
 if (isWindows) {
   ytDlpPath = join(__dirname, "yt-dlp.exe");
+} else if (fs.existsSync("/usr/local/bin/yt-dlp")) {
+  ytDlpPath = "/usr/local/bin/yt-dlp";
 } else if (fs.existsSync(join(__dirname, "yt-dlp"))) {
   ytDlpPath = join(__dirname, "yt-dlp");
 }
