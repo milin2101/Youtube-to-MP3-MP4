@@ -60,7 +60,7 @@ const Downloader = () => {
       const blob = new Blob([response.data]);
       const link = document.createElement('a');
       link.href = window.URL.createObjectURL(blob);
-      link.download = `${title || 'download'}.${format}`;
+      link.download = `${title || 'download'}.${type}`;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
